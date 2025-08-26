@@ -63,10 +63,10 @@ $ docker compose build web
 
 Аналогичным образом можно удалять библиотеки из зависимостей.
 
-<a name="env-variables"></a>
 ## Переменные окружения
 
-Образ с Django считывает настройки из переменных окружения:
+
+Образ с Django считывает настройки из переменных окружения, создайте файл .env в корневом каталоге и запишите туда данные в формате: ПЕРЕМЕННАЯ=значение:
 
 `SECRET_KEY` -- обязательная секретная настройка Django. Это соль для генерации хэшей. Значение может быть любым, важно лишь, чтобы оно никому не было известно. [Документация Django](https://docs.djangoproject.com/en/3.2/ref/settings/#secret-key).
 
@@ -75,3 +75,63 @@ $ docker compose build web
 `ALLOWED_HOSTS` -- настройка Django со списком разрешённых адресов. Если запрос прилетит на другой адрес, то сайт ответит ошибкой 400. Можно перечислить несколько адресов через запятую, например `127.0.0.1,192.168.0.1,site.test`. [Документация Django](https://docs.djangoproject.com/en/3.2/ref/settings/#allowed-hosts).
 
 `DATABASE_URL` -- адрес для подключения к базе данных PostgreSQL. Другие СУБД сайт не поддерживает. [Формат записи](https://github.com/jacobian/dj-database-url#url-schema).
+
+
+## Kubernetes
+
+### Локальный запуск с использованием кластера Minikube
+Для запуска необходимы:
+
+[См. документацию Docker Desktop](https://www.docker.com/get-started/)
+
+[См. документацию сubectl](https://kubernetes.io/docs/tasks/tools/)
+
+[См. документацию minikube](https://kubernetes.io/docs/tasks/tools/)
+
+
+Запустить кластер Minikube:
+```sh
+$ minikube start --driver=docker
+```
+* вместо docker можно использовать другой драйвер (например virtualbox), если он у вас настроен.
+
+### Передача чувствительных данных
+Для передачи чувствительных данных создайте файл secrets.yaml, замените значения переменных на свои см. раздел переменные окружения:
+
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: django-secrets
+type: Opaque
+stringData:
+  DEBUG: "False"
+  SECRET_KEY: "you_secret_key"
+  DATABASE_URL: "database_url"
+  ALLOWED_HOSTS: "allowe_hosts"
+```
+
+Создать объект в кластере для передачи чувствительных данных:
+```sh
+$ kubectl apply -f secrets.yaml
+```
+
+Запустить базу данный postgres:
+```sh
+$ в разрабюотке
+```
+Поднять django приложение:
+```sh
+$ kubectl apply -f django-deployment.yaml
+$ kubectl apply -f django-service.yaml
+```
+В новом терминале, запустите несколько команд:
+```sh
+kubectl exec -it deploy/django-deployment -- python manage.py migrate # создаём/обновляем таблицы в БД
+
+kubectl exec -it deploy/django-deployment -- python manage.py createsuperuser # создаём в БД учётку суперпользователя
+```
+Проверить доступность сайта, запустите команду и перейдите по выведенной ссылке:
+```sh
+minikube service django-service --url
+```
