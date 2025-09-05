@@ -5,7 +5,7 @@ metadata:
 
 spec:
   rules:
-    - host: star-burger.test
+    - host: your-domain.test
       http:
         paths:
           - path: /

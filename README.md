@@ -113,7 +113,7 @@ Gunicorn/uWSGI. [Подробнее про Nginx Unit](https://unit.nginx.org/).
 1. **Запустить кластер Minikube:**
 
     ```sh
-      minikube start --driver=virtualbox
+    minikube start --driver=virtualbox
     ```
     * *Вместо docker можно использовать другой драйвер (например, docker), если он у вас настроен:*
 
@@ -139,28 +139,30 @@ Gunicorn/uWSGI. [Подробнее про Nginx Unit](https://unit.nginx.org/).
 
    Примените:
     ```sh
-      kubectl apply -f secrets.yaml
+    kubectl apply -f secrets.yaml
     ```
 
 3. **Запуск приложения:**
     - Запуск базы данных PostgreSQL: (в разработке)
     - Запуск Django-приложения и сервиса:
         ```sh
-          kubectl apply -f django-deployment.yaml
-          kubectl apply -f django-service.yaml
+        kubectl apply -f django-deployment.yaml
+        kubectl apply -f django-service.yaml
         ```
-4. **Выполнить миграции и создать суперпользователя:**
-    ```sh
-      kubectl exec -it deploy/django-deployment -- python manage.py migrate # создаём/обновляем таблицы в БД
-    
-      kubectl exec -it deploy/django-deployment -- python manage.py createsuperuser # создаём суперпользователя
+4. **Выполнить миграции:**
+    ```sh    
+    kubectl apply -f django-migrate.yaml
     ```
-5. **Проверить доступность сайта:**
+5. **Выполнить миграции и создать суперпользователя:**
+    ```sh    
+    kubectl exec -it deploy/django-deployment -- python manage.py createsuperuser # создаём суперпользователя
+    ```
+6. **Проверить доступность сайта:**
     ```sh
-      minikube service django-service --url
+    minikube service django-service --url
     ```
 
-6. **(Опционально) Настроить Ingress**
+7. **(*Опционально)* Настроить Ingress:**
     1. Отредактируйте файл `kubernetes/ingress-hosts.yaml`, укажите свой домен:
         ```
         ...
@@ -185,9 +187,9 @@ Gunicorn/uWSGI. [Подробнее про Nginx Unit](https://unit.nginx.org/).
             ```
     3. Примените манифест Ingress::
         ```sh
-          kubectl apply -f kubernetes/ingress-hosts.yaml
+        kubectl apply -f kubernetes/ingress-hosts.yaml
         ```
-7. **Настроить очистку сессий (CronJob)**
+8. **Настроить очистку сессий (*CronJob*):**
     ```sh
-      kubectl apply -f django-clearsessions.yaml
+    kubectl apply -f django-clearsessions.yaml
     ```

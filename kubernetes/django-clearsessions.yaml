@@ -4,10 +4,12 @@ metadata:
   name: django-clearsessions
 spec:
   schedule: "@monthly"
+  startingDeadlineSeconds: 30
   jobTemplate:
     spec:
       template:
         spec:
+          ttlSecondsAfterFinished: 60
           containers:
             - name: clearsessions
               image: dzimag/django_app:1.0
