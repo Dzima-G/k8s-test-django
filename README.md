@@ -187,3 +187,7 @@ Gunicorn/uWSGI. [Подробнее про Nginx Unit](https://unit.nginx.org/).
         ```sh
           kubectl apply -f kubernetes/ingress-hosts.yaml
         ```
+7. **Настроить очистку сессий (CronJob)**
+    ```sh
+      kubectl apply -f django-clearsessions.yaml
+    ```

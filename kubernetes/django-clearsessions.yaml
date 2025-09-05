@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: django-clearsessions
+spec:
+  schedule: "@monthly"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: clearsessions
+              image: dzimag/django_app:1.0
+              command: ["python", "manage.py", "clearsessions"]
+              envFrom:
+                - secretRef:
+                    name: django-secrets
+          restartPolicy: OnFailure
