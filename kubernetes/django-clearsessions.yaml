@@ -7,9 +7,9 @@ spec:
   startingDeadlineSeconds: 30
   jobTemplate:
     spec:
+      ttlSecondsAfterFinished: 60
       template:
         spec:
-          ttlSecondsAfterFinished: 60
           containers:
             - name: clearsessions
               image: dzimag/django_app:1.0
